@@ -9,6 +9,7 @@ export function fisheyeApp() {
     hasImage: false as boolean,
     isRendering: false as boolean,
     activeTab: 'fisheye' as string,
+    sheetOpen: false as boolean,
 
     params: {
       aspectRatio: '4:3',
