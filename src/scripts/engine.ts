@@ -90,7 +90,9 @@ export class FisheyeEngine {
       imageData = this._applyVignette(imageData, outW, outH, vignetteIntensity, vignetteRadius);
     }
 
-    imageData = this._applyCircularMask(imageData, outW, outH, borderSize, borderSoftness, borderColor);
+    if (distortionType === 'circular') {
+      imageData = this._applyCircularMask(imageData, outW, outH, borderSize, borderSoftness, borderColor);
+    }
 
     ctx.putImageData(imageData, 0, 0);
     this.processing = false;
@@ -233,8 +235,9 @@ export class FisheyeEngine {
 
     const cx = w / 2;
     const cy = h / 2;
-    // 1. Use Math.min to perfectly match your circular mask's boundaries
-    const maxR = Math.min(cx, cy);
+    const maxR = type === 'circular'
+      ? Math.min(cx, cy)
+      : Math.sqrt(cx * cx + cy * cy);
     const k = strength * 1.8;
 
     for (let y = 0; y < h; y++) {
@@ -255,23 +258,9 @@ export class FisheyeEngine {
         // Dividing by (1 + k) ensures the image stretches perfectly to the edge.
         const ru = (rd * (1 + k * rd * rd)) / (1 + k);
 
-        let srcX: number, srcY: number;
-
-        if (ru === 0) {
-          srcX = cx;
-          srcY = cy;
-        } else {
-          const scale = ru / (r || 0.0001);
-          srcX = cx + nx * maxR * scale;
-          srcY = cy + ny * maxR * scale;
-        }
-
-        // Failsafe: hide out-of-bounds pixels to prevent smearing
-        if (srcX < 0 || srcX > w - 1 || srcY < 0 || srcY > h - 1) {
-          const i = (y * w + x) * 4;
-          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
-          continue;
-        }
+        const scale = ru === 0 ? 0 : ru / (r || 0.0001);
+        const srcX = cx + nx * maxR * scale;
+        const srcY = cy + ny * maxR * scale;
 
         const color = bilinearSample(src, w, h, srcX, srcY);
         const i = (y * w + x) * 4;
