@@ -1,20 +1,10 @@
 ---
 ---
-<header class="flex items-center justify-between px-5 py-3 border-b border-fish-border shrink-0 bg-fish-bg">
-  <div class="flex items-center gap-3">
-    <div class="w-7 h-7 rounded-full bg-fish-panel border border-fish-border flex items-center justify-center text-xs">
-      <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-blue-400" stroke="currentColor" stroke-width="1.5">
-        <circle cx="12" cy="12" r="9"/>
-        <ellipse cx="12" cy="12" rx="4" ry="9"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-      </svg>
-    </div>
-    <span class="text-sm font-semibold tracking-wide text-fish-text">Eyes of Fish</span>
-    <span class="hidden sm:inline text-xs text-fish-muted ml-1">VX1000 · Century Optics</span>
-  </div>
-  <div class="flex items-center gap-2">
+<header class="flex items-center justify-between px-2 py-3 border-b border-fish-border shrink-0 bg-fish-bg">
+
+  <div class="flex items-center gap-2 w-full justify-between">
     <!-- Aspect ratio selector -->
-    <div class="hidden sm:flex items-center gap-1 bg-fish-panel rounded-md p-0.5 border border-fish-border">
+    <div class="flex items-center gap-1 bg-fish-panel rounded-md p-0.5 border border-fish-border">
       <template x-for="ar in ['4:3','3:2','1:1','16:9']">
         <button
           @click="params.aspectRatio = ar; render()"
@@ -49,6 +39,23 @@
         </svg>
       </button>
     </div>
+    <div class="flex gap-2">
+      
+      <!-- Theme Settings -->
+      <button
+      @click="toggleTheme()"
+      title="Toggle Dark/Light Theme"
+      class="flex items-center justify-center w-7 h-7 rounded-md border border-fish-border text-fish-muted hover:text-fish-text transition-all"
+      >
+      <svg x-show="theme === 'dark'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <svg x-show="theme === 'light'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
+
+    <div class="w-px h-5 bg-fish-border mx-1 hidden sm:block"></div>
     <!-- Export button -->
     <button
       @click="exportImage()"
@@ -58,23 +65,11 @@
       <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.8">
         <path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
       </svg>
+      <span class="hidden sm:block">
       Export
+      </span>
     </button>
     
-    <div class="w-px h-5 bg-fish-border mx-1 hidden sm:block"></div>
-    
-    <!-- Theme Settings -->
-    <button
-      @click="toggleTheme()"
-      title="Toggle Dark/Light Theme"
-      class="flex items-center justify-center w-7 h-7 rounded-md border border-fish-border text-fish-muted hover:text-fish-text transition-all"
-    >
-      <svg x-show="theme === 'dark'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-      <svg x-show="theme === 'light'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-      </svg>
-    </button>
+    </div>
   </div>
 </header>
