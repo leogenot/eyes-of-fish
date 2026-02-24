@@ -222,7 +222,3 @@ export function fisheyeApp() {
   };
 }
 
-declare global {
-  interface Window { fisheyeApp: typeof fisheyeApp; }
-}
-window.fisheyeApp = fisheyeApp;

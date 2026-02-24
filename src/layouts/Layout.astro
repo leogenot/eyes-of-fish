@@ -10,7 +10,13 @@ import '../styles/global.css';
 </head>
 <body x-data="fisheyeApp()" x-init="init()" class="flex flex-col h-screen overflow-hidden bg-[#0a0a0a]">
   <slot />
-  <script type="module" src="/src/scripts/app.ts"></script>
+  <script>
+    import { fisheyeApp } from '../scripts/app.ts';
+    declare global {
+      interface Window { fisheyeApp: typeof fisheyeApp; }
+    }
+    window.fisheyeApp = fisheyeApp;
+  </script>
   <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>
