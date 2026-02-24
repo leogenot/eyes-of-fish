@@ -1,5 +1,7 @@
 ---
+
 ---
+
 <div x-show="activeTab === 'image'" class="flex flex-col gap-0 p-3.5">
   <div class="mb-4">
     <p class="section-label">Light</p>
@@ -8,14 +10,20 @@
         <div>
           <div class="flex justify-between mb-1.5">
             <span class="text-xs text-[#666]" x-text="ctrl.label"></span>
-            <span class="text-xs text-[#888] font-mono" x-text="ctrl.format(params[ctrl.key])"></span>
+            <span
+              class="text-xs text-[#888] font-mono"
+              x-text="ctrl.format(params[ctrl.key])"></span>
           </div>
-          <input type="range"
-            :min="ctrl.min" :max="ctrl.max" :step="ctrl.step"
+          <input
+            type="range"
+            :min="ctrl.min"
+            :max="ctrl.max"
+            :step="ctrl.step"
             x-model.number="params[ctrl.key]"
             @pointerdown="pushHistory()"
             @input="render()"
-            class="w-full" />
+            class="w-full"
+          />
         </div>
       </template>
     </div>
@@ -27,14 +35,20 @@
         <div>
           <div class="flex justify-between mb-1.5">
             <span class="text-xs text-[#666]" x-text="ctrl.label"></span>
-            <span class="text-xs text-[#888] font-mono" x-text="ctrl.format(params[ctrl.key])"></span>
+            <span
+              class="text-xs text-[#888] font-mono"
+              x-text="ctrl.format(params[ctrl.key])"></span>
           </div>
-          <input type="range"
-            :min="ctrl.min" :max="ctrl.max" :step="ctrl.step"
+          <input
+            type="range"
+            :min="ctrl.min"
+            :max="ctrl.max"
+            :step="ctrl.step"
             x-model.number="params[ctrl.key]"
             @pointerdown="pushHistory()"
             @input="render()"
-            class="w-full" />
+            class="w-full"
+          />
         </div>
       </template>
     </div>
@@ -44,17 +58,19 @@
       <p class="section-label mb-0">Curve</p>
       <span class="text-[10px] text-[#888]">Dbl-click to remove</span>
     </div>
-    <div class="w-full aspect-square border border-[#e5e5e5] dark:border-[#333] rounded-md overflow-hidden relative touch-none bg-[#f9f9f9] dark:bg-[#111]">
-      <canvas 
-        x-ref="curveCanvas" 
-        width="256" height="256" 
+    <div
+      class="w-full aspect-square border border-[#e5e5e5] dark:border-[#333] rounded-md overflow-hidden relative touch-none bg-transparent dark:bg-transparent"
+    >
+      <canvas
+        x-ref="curveCanvas"
+        width="256"
+        height="256"
         class="w-full h-full block cursor-crosshair"
-        @pointerdown="startCurveDrag" 
-        @pointermove="moveCurveDrag" 
-        @pointerup="endCurveDrag" 
-        @pointercancel="endCurveDrag" 
-        @dblclick="removeCurvePoint"
-      ></canvas>
+        @pointerdown="startCurveDrag"
+        @pointermove="moveCurveDrag"
+        @pointerup="endCurveDrag"
+        @pointercancel="endCurveDrag"
+        @dblclick="removeCurvePoint"></canvas>
     </div>
   </div>
   <button
