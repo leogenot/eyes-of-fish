@@ -312,9 +312,9 @@ export function fisheyeApp() {
     applyVX1000Preset(this: any) {
       this.pushHistory();
       Object.assign(this.params, {
-        distortion: 0.60, distortionType: 'circular',
+        distortion: 0.35, distortionType: 'circular',
         borderSize: 0.10, borderSoftness: 0.35, borderColor: 'black',
-        fringeIntensity: 0.50, fringeRadius: 0.50,
+        fringeIntensity: 0.25, fringeRadius: 0.50,
         vignetteIntensity: 0.55, vignetteRadius: 0.40,
         contrast: 15, saturation: -8, shadows: -5,
       });
