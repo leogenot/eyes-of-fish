@@ -19,6 +19,7 @@ export class FisheyeEngine {
 
     const {
       aspectRatio,
+      rotation, zoom, panX, panY, flipH, flipV,
       distortion, distortionType,
       borderSize, borderSoftness, borderColor,
       fringeIntensity, fringeRadius,
@@ -53,7 +54,7 @@ export class FisheyeEngine {
     const src = this.sourceImage;
     const srcAspect = src.naturalWidth / src.naturalHeight;
     const outAspect = outW / outH;
-    let drawW: number, drawH: number, drawX: number, drawY: number;
+    let drawW: number, drawH: number;
     if (srcAspect > outAspect) {
       drawH = outH;
       drawW = drawH * srcAspect;
@@ -61,9 +62,15 @@ export class FisheyeEngine {
       drawW = outW;
       drawH = drawW / srcAspect;
     }
-    drawX = (outW - drawW) / 2;
-    drawY = (outH - drawH) / 2;
-    wCtx.drawImage(src, drawX, drawY, drawW, drawH);
+    const scaleX = zoom * (flipH ? -1 : 1);
+    const scaleY = zoom * (flipV ? -1 : 1);
+
+    wCtx.save();
+    wCtx.translate(outW / 2 + panX * outW, outH / 2 + panY * outH);
+    wCtx.rotate(rotation * Math.PI / 180);
+    wCtx.scale(scaleX, scaleY);
+    wCtx.drawImage(src, -drawW / 2, -drawH / 2, drawW, drawH);
+    wCtx.restore();
 
     let imageData = wCtx.getImageData(0, 0, outW, outH);
 
