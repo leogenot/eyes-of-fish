@@ -10,11 +10,11 @@
       </svg>
     </div>
     <span class="text-sm font-semibold tracking-wide text-white">Eyes of Fish</span>
-    <span class="text-xs text-[#444] ml-1">VX1000 · Century Optics</span>
+    <span class="hidden sm:inline text-xs text-[#444] ml-1">VX1000 · Century Optics</span>
   </div>
   <div class="flex items-center gap-2">
     <!-- Aspect ratio selector -->
-    <div class="flex items-center gap-1 bg-[#151515] rounded-md p-0.5 border border-[#222]">
+    <div class="hidden sm:flex items-center gap-1 bg-[#151515] rounded-md p-0.5 border border-[#222]">
       <template x-for="ar in ['4:3','3:2','1:1','16:9']">
         <button
           @click="params.aspectRatio = ar; render()"
