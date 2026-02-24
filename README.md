@@ -1,3 +1,3 @@
-# Fully vibe coded using Claude Code.
+# Fisheye image editor (Claude Code vibe code test)
 
-not a single line of code was written. (Needed to see how good the AI can be)
+Pretty impressive. (Needed to see how good the AI can be)
