@@ -4,8 +4,8 @@ import TransformTab from './TransformTab.astro';
 import ImageTab from './ImageTab.astro';
 ---
 <aside class="
-  fixed inset-x-0 bottom-0 z-20 flex flex-col bg-[#0d0d0d] border-t border-[#1a1a1a]
-  sm:static sm:inset-auto sm:z-auto sm:w-64 sm:shrink-0 sm:border-t-0 sm:border-r sm:border-[#1a1a1a] sm:overflow-y-auto
+  fixed inset-x-0 bottom-0 z-20 flex flex-col bg-fish-bg border-t border-fish-border
+  sm:static sm:inset-auto sm:z-auto sm:w-64 sm:shrink-0 sm:border-t-0 sm:border-r sm:border-fish-border sm:overflow-y-auto
 ">
 
   <!-- Drag handle (mobile only) -->
@@ -13,24 +13,24 @@ import ImageTab from './ImageTab.astro';
     class="sm:hidden flex justify-center items-center h-8 shrink-0 cursor-pointer"
     @click="sheetOpen = !sheetOpen"
   >
-    <div class="w-10 h-1 rounded-full bg-[#333]"></div>
+    <div class="w-10 h-1 rounded-full bg-fish-muted"></div>
   </div>
 
   <!-- Tab switcher -->
-  <div class="flex border-b border-[#1a1a1a] shrink-0">
+  <div class="flex border-b border-fish-border shrink-0">
     <button
       @click="sheetOpen = activeTab === 'fisheye' ? !sheetOpen : true; activeTab = 'fisheye'"
-      :class="activeTab === 'fisheye' ? 'text-white border-blue-500' : 'text-[#555] border-transparent hover:text-[#999]'"
+      :class="activeTab === 'fisheye' ? 'text-fish-text border-fish-accent' : 'text-fish-muted border-transparent hover:text-fish-text'"
       class="tab-btn flex-1 py-2.5 text-xs font-medium border-b-2 transition-all"
     >Fisheye</button>
     <button
       @click="sheetOpen = activeTab === 'transform' ? !sheetOpen : true; activeTab = 'transform'"
-      :class="activeTab === 'transform' ? 'text-white border-blue-500' : 'text-[#555] border-transparent hover:text-[#999]'"
+      :class="activeTab === 'transform' ? 'text-fish-text border-fish-accent' : 'text-fish-muted border-transparent hover:text-fish-text'"
       class="tab-btn flex-1 py-2.5 text-xs font-medium border-b-2 transition-all"
     >Transform</button>
     <button
       @click="sheetOpen = activeTab === 'image' ? !sheetOpen : true; activeTab = 'image'"
-      :class="activeTab === 'image' ? 'text-white border-blue-500' : 'text-[#555] border-transparent hover:text-[#999]'"
+      :class="activeTab === 'image' ? 'text-fish-text border-fish-accent' : 'text-fish-muted border-transparent hover:text-fish-text'"
       class="tab-btn flex-1 py-2.5 text-xs font-medium border-b-2 transition-all"
     >Image</button>
   </div>

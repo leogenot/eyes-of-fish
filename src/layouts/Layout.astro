@@ -7,8 +7,19 @@ import '../styles/global.css';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eyes of Fish — VX1000 Fisheye Editor</title>
+  <script is:inline>
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        // Default to light when there is no saved preference
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
 </head>
-<body x-data="fisheyeApp()" x-init="init()" class="flex flex-col h-screen overflow-hidden bg-[#0a0a0a]">
+<body x-data="fisheyeApp()" x-init="init()" class="flex flex-col h-screen overflow-hidden bg-fish-bg">
   <slot />
   <script>
     import { fisheyeApp } from '../scripts/app.ts';

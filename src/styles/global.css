@@ -1,13 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-fish-bg: #0a0a0a;
-  --color-fish-panel: #111111;
-  --color-fish-border: #222222;
-  --color-fish-accent: #3b82f6;
-  --color-fish-accent-dim: #1d4ed8;
-  --color-fish-text: #e5e5e5;
-  --color-fish-muted: #666666;
+  --color-fish-bg: var(--fish-bg);
+  --color-fish-panel: var(--fish-panel);
+  --color-fish-border: var(--fish-border);
+  --color-fish-accent: var(--fish-accent);
+  --color-fish-accent-dim: var(--fish-accent-dim);
+  --color-fish-text: var(--fish-text);
+  --color-fish-muted: var(--fish-muted);
+}
+
+:root {
+  --fish-bg: #f9fafb;
+  --fish-panel: #f3f4f6;
+  --fish-border: #e5e7eb;
+  --fish-accent: #2563eb;
+  --fish-accent-dim: #1d4ed8;
+  --fish-text: #111827;
+  --fish-muted: #6b7280;
+}
+
+.dark {
+  --fish-bg: #0a0a0a;
+  --fish-panel: #111111;
+  --fish-border: #222222;
+  --fish-accent: #3b82f6;
+  --fish-accent-dim: #1d4ed8;
+  --fish-text: #e5e5e5;
+  --fish-muted: #666666;
 }
 
 * {
@@ -15,8 +35,8 @@
 }
 
 body {
-  background-color: #0a0a0a;
-  color: #e5e5e5;
+  background-color: var(--fish-bg);
+  color: var(--fish-text);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow: hidden;
   height: 100vh;
@@ -27,10 +47,10 @@ body {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #111;
+  background: var(--fish-panel);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--fish-muted);
   border-radius: 2px;
 }
 
@@ -39,7 +59,7 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   height: 3px;
-  background: #333;
+  background: var(--fish-border);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -49,18 +69,18 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
   height: 14px;
-  background: #e5e5e5;
+  background: var(--fish-text);
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.15s;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  background: #3b82f6;
+  background: var(--fish-accent);
 }
 input[type="range"]::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: #e5e5e5;
+  background: var(--fish-text);
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -71,8 +91,8 @@ input[type="range"]::-moz-range-thumb {
   transition: border-color 0.2s, background-color 0.2s;
 }
 .drop-zone.drag-over {
-  border-color: #3b82f6;
-  background-color: rgba(59, 130, 246, 0.05);
+  border-color: var(--fish-accent);
+  background-color: var(--fish-border);
 }
 
 /* Canvas container */
@@ -89,10 +109,10 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #666;
+  color: var(--fish-muted);
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #1f1f1f;
+  border-bottom: 1px solid var(--fish-border);
 }
 
 /* Tabs */

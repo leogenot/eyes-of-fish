@@ -1,24 +1,24 @@
 ---
 ---
-<header class="flex items-center justify-between px-5 py-3 border-b border-[#1a1a1a] shrink-0 bg-[#0d0d0d]">
+<header class="flex items-center justify-between px-5 py-3 border-b border-fish-border shrink-0 bg-fish-bg">
   <div class="flex items-center gap-3">
-    <div class="w-7 h-7 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center text-xs">
+    <div class="w-7 h-7 rounded-full bg-fish-panel border border-fish-border flex items-center justify-center text-xs">
       <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-blue-400" stroke="currentColor" stroke-width="1.5">
         <circle cx="12" cy="12" r="9"/>
         <ellipse cx="12" cy="12" rx="4" ry="9"/>
         <line x1="3" y1="12" x2="21" y2="12"/>
       </svg>
     </div>
-    <span class="text-sm font-semibold tracking-wide text-white">Eyes of Fish</span>
-    <span class="hidden sm:inline text-xs text-[#444] ml-1">VX1000 · Century Optics</span>
+    <span class="text-sm font-semibold tracking-wide text-fish-text">Eyes of Fish</span>
+    <span class="hidden sm:inline text-xs text-fish-muted ml-1">VX1000 · Century Optics</span>
   </div>
   <div class="flex items-center gap-2">
     <!-- Aspect ratio selector -->
-    <div class="hidden sm:flex items-center gap-1 bg-[#151515] rounded-md p-0.5 border border-[#222]">
+    <div class="hidden sm:flex items-center gap-1 bg-fish-panel rounded-md p-0.5 border border-fish-border">
       <template x-for="ar in ['4:3','3:2','1:1','16:9']">
         <button
           @click="params.aspectRatio = ar; render()"
-          :class="params.aspectRatio === ar ? 'bg-[#252525] text-white' : 'text-[#555] hover:text-[#999]'"
+          :class="params.aspectRatio === ar ? 'bg-fish-border text-fish-text' : 'text-fish-muted hover:text-fish-text'"
           class="px-2.5 py-1 rounded text-xs font-mono transition-all"
           x-text="ar"
         ></button>
@@ -30,7 +30,7 @@
         @click="undo()"
         :disabled="!canUndo"
         title="Undo (Ctrl+Z)"
-        class="flex items-center justify-center w-7 h-7 rounded-md border border-[#222] text-[#555] hover:text-[#999] hover:border-[#444] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        class="flex items-center justify-center w-7 h-7 rounded-md border border-fish-border text-fish-muted hover:text-fish-text hover:border-fish-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
       >
         <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.8">
           <path d="M3 7H10.5C12.4 7 14 8.6 14 10.5C14 12.4 12.4 14 10.5 14H7"/>
@@ -41,7 +41,7 @@
         @click="redo()"
         :disabled="!canRedo"
         title="Redo (Ctrl+Shift+Z)"
-        class="flex items-center justify-center w-7 h-7 rounded-md border border-[#222] text-[#555] hover:text-[#999] hover:border-[#444] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        class="flex items-center justify-center w-7 h-7 rounded-md border border-fish-border text-fish-muted hover:text-fish-text hover:border-fish-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
       >
         <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.8">
           <path d="M13 7H5.5C3.6 7 2 8.6 2 10.5C2 12.4 3.6 14 5.5 14H9"/>
@@ -53,12 +53,28 @@
     <button
       @click="exportImage()"
       :disabled="!hasImage"
-      class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-[#1a1a1a] disabled:text-[#444] text-white text-xs font-medium rounded-md transition-colors"
+      class="flex items-center gap-1.5 px-3 py-1.5 bg-fish-accent hover:bg-fish-accent-dim disabled:bg-fish-panel disabled:text-fish-muted text-white text-xs font-medium rounded-md transition-colors"
     >
       <svg viewBox="0 0 16 16" fill="none" class="w-3.5 h-3.5" stroke="currentColor" stroke-width="1.8">
         <path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
       </svg>
       Export
+    </button>
+    
+    <div class="w-px h-5 bg-fish-border mx-1 hidden sm:block"></div>
+    
+    <!-- Theme Settings -->
+    <button
+      @click="toggleTheme()"
+      title="Toggle Dark/Light Theme"
+      class="flex items-center justify-center w-7 h-7 rounded-md border border-fish-border text-fish-muted hover:text-fish-text transition-all"
+    >
+      <svg x-show="theme === 'dark'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <svg x-show="theme === 'light'" viewBox="0 0 24 24" fill="none" class="w-4 h-4" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
     </button>
   </div>
 </header>

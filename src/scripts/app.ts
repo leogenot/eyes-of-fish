@@ -10,6 +10,7 @@ export function fisheyeApp() {
     isRendering: false as boolean,
     activeTab: 'fisheye' as string,
     sheetOpen: false as boolean,
+    theme: 'light' as 'light' | 'dark',
 
     params: {
       aspectRatio: '4:3',
@@ -45,13 +46,13 @@ export function fisheyeApp() {
 
     imageControls: {
       light: [
-        { key: 'exposure',   label: 'Exposure',   min: -2,   max: 2,   step: 0.05, format: (v: number) => (v >= 0 ? '+' : '') + v.toFixed(2) + ' EV' },
-        { key: 'contrast',   label: 'Contrast',   min: -100, max: 100, step: 1,    format: (v: number) => (v >= 0 ? '+' : '') + v },
-        { key: 'highlights', label: 'Highlights', min: -100, max: 100, step: 1,    format: (v: number) => (v >= 0 ? '+' : '') + v },
-        { key: 'shadows',    label: 'Shadows',    min: -100, max: 100, step: 1,    format: (v: number) => (v >= 0 ? '+' : '') + v },
+        { key: 'exposure', label: 'Exposure', min: -2, max: 2, step: 0.05, format: (v: number) => (v >= 0 ? '+' : '') + v.toFixed(2) + ' EV' },
+        { key: 'contrast', label: 'Contrast', min: -100, max: 100, step: 1, format: (v: number) => (v >= 0 ? '+' : '') + v },
+        { key: 'highlights', label: 'Highlights', min: -100, max: 100, step: 1, format: (v: number) => (v >= 0 ? '+' : '') + v },
+        { key: 'shadows', label: 'Shadows', min: -100, max: 100, step: 1, format: (v: number) => (v >= 0 ? '+' : '') + v },
       ],
       color: [
-        { key: 'saturation',  label: 'Saturation',  min: -100, max: 100, step: 1, format: (v: number) => (v >= 0 ? '+' : '') + v },
+        { key: 'saturation', label: 'Saturation', min: -100, max: 100, step: 1, format: (v: number) => (v >= 0 ? '+' : '') + v },
         { key: 'temperature', label: 'Temperature', min: -100, max: 100, step: 1, format: (v: number) => v > 0 ? '+' + v + ' warm' : v < 0 ? v + ' cool' : '0' },
       ],
     } as ImageControls,
@@ -82,6 +83,7 @@ export function fisheyeApp() {
     },
 
     async init(this: any) {
+      this.initTheme();
       engine.setCanvas(this.$refs.canvas);
 
       // Restore saved params
@@ -122,9 +124,35 @@ export function fisheyeApp() {
       });
     },
 
+    initTheme(this: any) {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        this.theme = saved;
+      } else {
+        // Default to light when there is no saved preference
+        this.theme = 'light';
+      }
+      this.applyTheme();
+    },
+
+    toggleTheme(this: any) {
+      this.theme = this.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', this.theme);
+      this.applyTheme();
+      if (this.activeTab === 'transform') this.drawGrid(); // Redraw grid with correct colors
+    },
+
+    applyTheme(this: any) {
+      if (this.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    },
+
     canvasWrapperStyle(this: any): string {
-      const ratios: Record<string, number> = { '4:3': 4/3, '3:2': 3/2, '1:1': 1, '16:9': 16/9 };
-      const r = ratios[this.params.aspectRatio] ?? 4/3;
+      const ratios: Record<string, number> = { '4:3': 4 / 3, '3:2': 3 / 2, '1:1': 1, '16:9': 16 / 9 };
+      const r = ratios[this.params.aspectRatio] ?? 4 / 3;
       return r >= 1
         ? `width: min(80vw, calc(75vh * ${r})); aspect-ratio: ${r};`
         : `height: min(80vh, calc(75vw / ${r})); aspect-ratio: ${r};`;
@@ -197,20 +225,20 @@ export function fisheyeApp() {
       if (this.gridOptions.diagonal) {
         ctx.strokeStyle = 'rgba(255,255,255,0.07)';
         ctx.lineWidth = 0.5;
-        ctx.beginPath(); ctx.moveTo(0, 0);   ctx.lineTo(w, h); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(w, 0);   ctx.lineTo(0, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w, 0); ctx.lineTo(0, h); ctx.stroke();
       }
 
       if (this.gridOptions.thirds) {
         ctx.strokeStyle = 'rgba(255,255,255,0.22)';
         ctx.lineWidth = 1;
-        for (const t of [1/3, 2/3]) {
+        for (const t of [1 / 3, 2 / 3]) {
           ctx.beginPath(); ctx.moveTo(w * t, 0); ctx.lineTo(w * t, h); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(0, h * t); ctx.lineTo(w, h * t); ctx.stroke();
         }
         ctx.fillStyle = 'rgba(255,255,255,0.35)';
-        for (const tx of [1/3, 2/3]) {
-          for (const ty of [1/3, 2/3]) {
+        for (const tx of [1 / 3, 2 / 3]) {
+          for (const ty of [1 / 3, 2 / 3]) {
             ctx.beginPath(); ctx.arc(w * tx, h * ty, 2.5, 0, Math.PI * 2); ctx.fill();
           }
         }
