@@ -1,0 +1,46 @@
+---
+---
+<div x-show="activeTab === 'image'" class="flex flex-col gap-0 p-3.5">
+  <div class="mb-4">
+    <p class="section-label">Light</p>
+    <div class="flex flex-col gap-3">
+      <template x-for="ctrl in imageControls.light">
+        <div>
+          <div class="flex justify-between mb-1.5">
+            <span class="text-xs text-[#666]" x-text="ctrl.label"></span>
+            <span class="text-xs text-[#888] font-mono" x-text="ctrl.format(params[ctrl.key])"></span>
+          </div>
+          <input type="range"
+            :min="ctrl.min" :max="ctrl.max" :step="ctrl.step"
+            x-model.number="params[ctrl.key]"
+            @input="render()"
+            class="w-full" />
+        </div>
+      </template>
+    </div>
+  </div>
+  <div class="mb-4">
+    <p class="section-label">Color</p>
+    <div class="flex flex-col gap-3">
+      <template x-for="ctrl in imageControls.color">
+        <div>
+          <div class="flex justify-between mb-1.5">
+            <span class="text-xs text-[#666]" x-text="ctrl.label"></span>
+            <span class="text-xs text-[#888] font-mono" x-text="ctrl.format(params[ctrl.key])"></span>
+          </div>
+          <input type="range"
+            :min="ctrl.min" :max="ctrl.max" :step="ctrl.step"
+            x-model.number="params[ctrl.key]"
+            @input="render()"
+            class="w-full" />
+        </div>
+      </template>
+    </div>
+  </div>
+  <button
+    @click="resetImage()"
+    class="w-full py-2 text-xs border border-[#1f1f1f] rounded-md text-[#555] hover:text-[#999] transition-all mt-1"
+  >
+    Reset Image
+  </button>
+</div>
