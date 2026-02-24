@@ -1,5 +1,6 @@
 import { FisheyeEngine } from './engine.ts';
 import type { FisheyeParams, GridOptions, ImageControls } from '../types/index.ts';
+import { saveImage, loadImage, saveParams, loadParams } from './storage.ts';
 
 const engine = new FisheyeEngine();
 
@@ -54,10 +55,69 @@ export function fisheyeApp() {
       ],
     } as ImageControls,
 
-    init(this: any) {
+    past: [] as FisheyeParams[],
+    future: [] as FisheyeParams[],
+
+    get canUndo(): boolean { return this.past.length > 0; },
+    get canRedo(): boolean { return this.future.length > 0; },
+
+    pushHistory(this: any) {
+      this.past.push({ ...this.params });
+      this.future = [];
+    },
+
+    undo(this: any) {
+      if (!this.past.length) return;
+      this.future.push({ ...this.params });
+      Object.assign(this.params, this.past.pop());
+      this.render();
+    },
+
+    redo(this: any) {
+      if (!this.future.length) return;
+      this.past.push({ ...this.params });
+      Object.assign(this.params, this.future.pop());
+      this.render();
+    },
+
+    async init(this: any) {
       engine.setCanvas(this.$refs.canvas);
+
+      // Restore saved params
+      const savedParams = loadParams();
+      if (savedParams) Object.assign(this.params, savedParams);
+
+      // Restore saved image
+      const blob = await loadImage();
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          engine.loadImage(img);
+          URL.revokeObjectURL(url);
+          this.hasImage = true;
+          this.$nextTick(() => this.render());
+        };
+        img.src = url;
+      }
+
+      // Watch tab changes
       this.$watch('activeTab', (val: string) => {
         if (val === 'transform') this.$nextTick(() => this.drawGrid());
+      });
+
+      // Keyboard shortcuts: Ctrl/Cmd+Z = undo, +Shift or Ctrl+Y = redo
+      window.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        if (e.key === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) this.redo();
+          else this.undo();
+        }
+        if (e.key === 'y') {
+          e.preventDefault();
+          this.redo();
+        }
       });
     },
 
@@ -86,7 +146,11 @@ export function fisheyeApp() {
       const img = new Image();
       img.onload = () => {
         engine.loadImage(img);
+        URL.revokeObjectURL(url);
+        saveImage(file);
         this.hasImage = true;
+        this.past = [];
+        this.future = [];
         this.$nextTick(() => this.render());
       };
       img.src = url;
@@ -98,6 +162,7 @@ export function fisheyeApp() {
       await new Promise<void>(r => setTimeout(r, 0));
       await engine.render({ ...this.params });
       this.isRendering = false;
+      saveParams(this.params);
       if (this.activeTab === 'transform') this.drawGrid();
     },
 
@@ -182,6 +247,7 @@ export function fisheyeApp() {
     },
 
     applyVX1000Preset(this: any) {
+      this.pushHistory();
       Object.assign(this.params, {
         distortion: 0.60, distortionType: 'circular',
         borderSize: 0.10, borderSoftness: 0.35, borderColor: 'black',
@@ -193,11 +259,13 @@ export function fisheyeApp() {
     },
 
     resetTransform(this: any) {
+      this.pushHistory();
       Object.assign(this.params, { rotation: 0, zoom: 1, panX: 0, panY: 0, flipH: false, flipV: false });
       this.render();
     },
 
     resetFisheye(this: any) {
+      this.pushHistory();
       Object.assign(this.params, {
         distortion: 0, distortionType: 'circular',
         borderSize: 0, borderSoftness: 0.4, borderColor: 'black',
@@ -208,6 +276,7 @@ export function fisheyeApp() {
     },
 
     resetImage(this: any) {
+      this.pushHistory();
       Object.assign(this.params, { exposure: 0, contrast: 0, highlights: 0, shadows: 0, saturation: 0, temperature: 0 });
       this.render();
     },
@@ -221,4 +290,3 @@ export function fisheyeApp() {
     },
   };
 }
-
