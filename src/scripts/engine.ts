@@ -161,67 +161,6 @@ export class FisheyeEngine {
     return imageData;
   }
 
-  // private _applyBarrelDistortion(
-  //   imageData: ImageData,
-  //   w: number,
-  //   h: number,
-  //   strength: number,
-  //   type: string,
-  // ): ImageData {
-  //   const src = imageData.data;
-  //   const out = new ImageData(w, h);
-  //   const dst = out.data;
-
-  //   const cx = w / 2;
-  //   const cy = h / 2;
-  //   const maxR = Math.sqrt(cx * cx + cy * cy);
-  //   const k = strength * 1.8;
-
-  //   for (let y = 0; y < h; y++) {
-  //     for (let x = 0; x < w; x++) {
-  //       const nx = (x - cx) / maxR;
-  //       const ny = (y - cy) / maxR;
-  //       const r = Math.sqrt(nx * nx + ny * ny);
-
-  //       let srcX: number, srcY: number;
-
-  //       if (type === 'circular' && r > 1.0) {
-  //         const i = (y * w + x) * 4;
-  //         dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
-  //         continue;
-  //       }
-
-  //       const rd = r;
-  //       const ru = rd * (1 + k * rd * rd);
-
-  //       if (ru === 0) {
-  //         srcX = cx;
-  //         srcY = cy;
-  //       } else {
-  //         const scale = ru / (r || 0.0001);
-  //         srcX = cx + nx * maxR * scale;
-  //         srcY = cy + ny * maxR * scale;
-  //       }
-  //       if (srcX < 0 || srcX > w - 1 || srcY < 0 || srcY > h - 1) {
-  //         const i = (y * w + x) * 4;
-  //         dst[i] = 0;
-  //         dst[i + 1] = 0;
-  //         dst[i + 2] = 0;
-  //         dst[i + 3] = 0; // Set to 0 for transparent, or 255 for black background
-  //         continue;
-  //       }
-
-  //       const color = bilinearSample(src, w, h, srcX, srcY);
-  //       const i = (y * w + x) * 4;
-  //       dst[i] = color[0];
-  //       dst[i + 1] = color[1];
-  //       dst[i + 2] = color[2];
-  //       dst[i + 3] = color[3];
-  //     }
-  //   }
-  //   return out;
-  // }
-
   private _applyBarrelDistortion(
     imageData: ImageData,
     w: number,
