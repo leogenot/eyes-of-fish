@@ -65,8 +65,15 @@ export class FisheyeEngine {
     const scaleX = zoom * (flipH ? -1 : 1);
     const scaleY = zoom * (flipV ? -1 : 1);
 
+    // Interpret panX/panY as percentages of how far we move across
+    // the *image* as we zoom. To keep the same part of the image
+    // under the center when zoom changes, the screen-space offset
+    // must grow with zoom.
+    const panScreenX = panX * outW * zoom;
+    const panScreenY = panY * outH * zoom;
+
     wCtx.save();
-    wCtx.translate(outW / 2 + panX * outW, outH / 2 + panY * outH);
+    wCtx.translate(outW / 2 + panScreenX, outH / 2 + panScreenY);
     wCtx.rotate(rotation * Math.PI / 180);
     wCtx.scale(scaleX, scaleY);
     wCtx.drawImage(src, -drawW / 2, -drawH / 2, drawW, drawH);

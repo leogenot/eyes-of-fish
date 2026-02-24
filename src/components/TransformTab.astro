@@ -1,22 +1,34 @@
 ---
----
-<div x-show="activeTab === 'transform'" class="flex flex-col gap-0 p-3.5">
 
+---
+
+<div x-show="activeTab === 'transform'" class="flex flex-col gap-0 p-3.5">
   <!-- Rotation -->
   <div class="mb-4">
     <p class="section-label">Rotation</p>
     <div>
       <div class="flex justify-between mb-1.5">
         <span class="text-xs text-[#666]">Angle</span>
-        <span class="text-xs text-[#888] font-mono" x-text="params.rotation + '°'"></span>
+        <span
+          class="text-xs text-[#888] font-mono"
+          x-text="params.rotation + '°'"></span>
       </div>
-      <input type="range" min="-180" max="180" step="0.5"
-        x-model.number="params.rotation" @pointerdown="pushHistory()" @input="render()" class="w-full" />
+      <input
+        type="range"
+        min="-180"
+        max="180"
+        step="0.5"
+        x-model.number="params.rotation"
+        @pointerdown="pushHistory()"
+        @input="render()"
+        class="w-full"
+      />
       <button
         x-show="params.rotation !== 0"
         @click="pushHistory(); params.rotation = 0; render()"
         class="mt-1.5 text-xs text-[#444] hover:text-[#888] transition-colors"
-      >↩ Reset to 0°</button>
+        >↩ Reset to 0°</button
+      >
     </div>
   </div>
 
@@ -27,26 +39,58 @@
       <div>
         <div class="flex justify-between mb-1.5">
           <span class="text-xs text-[#666]">Zoom</span>
-          <span class="text-xs text-[#888] font-mono" x-text="params.zoom.toFixed(2) + '×'"></span>
+          <span
+            class="text-xs text-[#888] font-mono"
+            x-text="params.zoom.toFixed(2) + '×'"></span>
         </div>
-        <input type="range" min="0.5" max="3" step="0.01"
-          x-model.number="params.zoom" @pointerdown="pushHistory()" @input="render()" class="w-full" />
+        <input
+          type="range"
+          min="0.5"
+          max="3"
+          step="0.01"
+          x-model.number="params.zoom"
+          @pointerdown="pushHistory()"
+          @input="render()"
+          class="w-full"
+        />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
           <span class="text-xs text-[#666]">Pan X</span>
-          <span class="text-xs text-[#888] font-mono" x-text="(params.panX >= 0 ? '+' : '') + Math.round(params.panX * 100) + '%'"></span>
+          <span
+            class="text-xs text-[#888] font-mono"
+            x-text="(params.panX >= 0 ? '+' : '') + Math.round(params.panX * 100) + '%'"
+          ></span>
         </div>
-        <input type="range" min="-0.5" max="0.5" step="0.005"
-          x-model.number="params.panX" @pointerdown="pushHistory()" @input="render()" class="w-full" />
+        <input
+          type="range"
+          min="-1"
+          max="1"
+          step="0.005"
+          x-model.number="params.panX"
+          @pointerdown="pushHistory()"
+          @input="render()"
+          class="w-full"
+        />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
           <span class="text-xs text-[#666]">Pan Y</span>
-          <span class="text-xs text-[#888] font-mono" x-text="(params.panY >= 0 ? '+' : '') + Math.round(params.panY * 100) + '%'"></span>
+          <span
+            class="text-xs text-[#888] font-mono"
+            x-text="(params.panY >= 0 ? '+' : '') + Math.round(params.panY * 100) + '%'"
+          ></span>
         </div>
-        <input type="range" min="-0.5" max="0.5" step="0.005"
-          x-model.number="params.panY" @pointerdown="pushHistory()" @input="render()" class="w-full" />
+        <input
+          type="range"
+          min="-1"
+          max="1"
+          step="0.005"
+          x-model.number="params.panY"
+          @pointerdown="pushHistory()"
+          @input="render()"
+          class="w-full"
+        />
       </div>
     </div>
   </div>
@@ -60,8 +104,14 @@
         :class="params.flipH ? 'bg-[#1e293b] border-blue-600 text-blue-400' : 'border-[#222] text-[#555] hover:text-[#999]'"
         class="flex-1 py-2 text-xs border rounded-md transition-all flex items-center justify-center gap-1.5"
       >
-        <svg viewBox="0 0 16 16" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M8 2v12M5 5l-3 3 3 3M11 5l3 3-3 3"/>
+        <svg
+          viewBox="0 0 16 16"
+          class="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M8 2v12M5 5l-3 3 3 3M11 5l3 3-3 3"></path>
         </svg>
         Horizontal
       </button>
@@ -70,8 +120,14 @@
         :class="params.flipV ? 'bg-[#1e293b] border-blue-600 text-blue-400' : 'border-[#222] text-[#555] hover:text-[#999]'"
         class="flex-1 py-2 text-xs border rounded-md transition-all flex items-center justify-center gap-1.5"
       >
-        <svg viewBox="0 0 16 16" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M2 8h12M5 5l3-3 3 3M5 11l3 3 3-3"/>
+        <svg
+          viewBox="0 0 16 16"
+          class="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M2 8h12M5 5l3-3 3 3M5 11l3 3 3-3"></path>
         </svg>
         Vertical
       </button>
@@ -83,23 +139,39 @@
     <p class="section-label">Grid Overlay</p>
     <div class="flex flex-col gap-2">
       <label class="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" x-model="gridOptions.thirds" @change="drawGrid()"
-          class="w-3 h-3 accent-blue-500" />
+        <input
+          type="checkbox"
+          x-model="gridOptions.thirds"
+          @change="drawGrid()"
+          class="w-3 h-3 accent-blue-500"
+        />
         <span class="text-xs text-[#666]">Rule of Thirds</span>
       </label>
       <label class="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" x-model="gridOptions.fine" @change="drawGrid()"
-          class="w-3 h-3 accent-blue-500" />
+        <input
+          type="checkbox"
+          x-model="gridOptions.fine"
+          @change="drawGrid()"
+          class="w-3 h-3 accent-blue-500"
+        />
         <span class="text-xs text-[#666]">Fine Grid</span>
       </label>
       <label class="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" x-model="gridOptions.diagonal" @change="drawGrid()"
-          class="w-3 h-3 accent-blue-500" />
+        <input
+          type="checkbox"
+          x-model="gridOptions.diagonal"
+          @change="drawGrid()"
+          class="w-3 h-3 accent-blue-500"
+        />
         <span class="text-xs text-[#666]">Diagonals</span>
       </label>
       <label class="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" x-model="gridOptions.circle" @change="drawGrid()"
-          class="w-3 h-3 accent-blue-500" />
+        <input
+          type="checkbox"
+          x-model="gridOptions.circle"
+          @change="drawGrid()"
+          class="w-3 h-3 accent-blue-500"
+        />
         <span class="text-xs text-[#666]">Fisheye Circle Guide</span>
       </label>
     </div>
