@@ -1,0 +1,16 @@
+---
+import '../styles/global.css';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eyes of Fish — VX1000 Fisheye Editor</title>
+</head>
+<body x-data="fisheyeApp()" x-init="init()" class="flex flex-col h-screen overflow-hidden bg-[#0a0a0a]">
+  <slot />
+  <script type="module" src="/src/scripts/app.ts"></script>
+  <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>
