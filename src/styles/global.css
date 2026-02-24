@@ -99,3 +99,16 @@ input[type="range"]::-moz-range-thumb {
 .tab-btn {
   transition: color 0.15s, border-color 0.15s;
 }
+
+/* Mobile bottom sheet panel */
+@media (max-width: 639px) {
+  .sheet-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+  .sheet-content.open {
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+}
