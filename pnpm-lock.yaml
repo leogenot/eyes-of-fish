@@ -9,16 +9,16 @@ importers:
   .:
     dependencies:
       '@tailwindcss/vite':
-        specifier: ^4.0.0
+        specifier: ^4.2.1
         version: 4.2.1(vite@6.4.1(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
       alpinejs:
-        specifier: ^3.14.0
+        specifier: ^3.15.8
         version: 3.15.8
       astro:
-        specifier: ^5.1.0
+        specifier: ^5.17.3
         version: 5.17.3(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2)
       tailwindcss:
-        specifier: ^4.0.0
+        specifier: ^4.2.1
         version: 4.2.1
     devDependencies:
       '@astrojs/check':
