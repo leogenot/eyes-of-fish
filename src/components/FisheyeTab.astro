@@ -7,12 +7,12 @@
     <p class="section-label">Lens Type</p>
     <div class="flex gap-1.5">
       <button
-        @click="params.distortionType = 'circular'; render()"
+        @click="pushHistory(); params.distortionType = 'circular'; render()"
         :class="params.distortionType === 'circular' ? 'bg-[#1e293b] border-blue-600 text-blue-400' : 'border-[#222] text-[#555] hover:text-[#999]'"
         class="flex-1 py-2 text-xs border rounded-md transition-all"
       >Circular</button>
       <button
-        @click="params.distortionType = 'full'; render()"
+        @click="pushHistory(); params.distortionType = 'full'; render()"
         :class="params.distortionType === 'full' ? 'bg-[#1e293b] border-blue-600 text-blue-400' : 'border-[#222] text-[#555] hover:text-[#999]'"
         class="flex-1 py-2 text-xs border rounded-md transition-all"
       >Full Frame</button>
@@ -29,7 +29,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.distortion * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.distortion" @input="render()" class="w-full" />
+          x-model.number="params.distortion" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.borderSize * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.borderSize" @input="render()" class="w-full" />
+          x-model.number="params.borderSize" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
@@ -52,7 +52,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.borderSoftness * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.borderSoftness" @input="render()" class="w-full" />
+          x-model.number="params.borderSoftness" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
@@ -60,12 +60,12 @@
         </div>
         <div class="flex gap-1.5">
           <button
-            @click="params.borderColor = 'black'; render()"
+            @click="pushHistory(); params.borderColor = 'black'; render()"
             :class="params.borderColor === 'black' ? 'border-blue-600' : 'border-[#333]'"
             class="flex-1 py-1.5 text-xs border rounded-md bg-black text-[#666] transition-all hover:border-[#555]"
           >Black</button>
           <button
-            @click="params.borderColor = 'white'; render()"
+            @click="pushHistory(); params.borderColor = 'white'; render()"
             :class="params.borderColor === 'white' ? 'border-blue-600' : 'border-[#333]'"
             class="flex-1 py-1.5 text-xs border rounded-md bg-white text-black transition-all hover:border-[#555]"
           >White</button>
@@ -84,7 +84,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.fringeIntensity * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.fringeIntensity" @input="render()" class="w-full" />
+          x-model.number="params.fringeIntensity" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
@@ -92,7 +92,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.fringeRadius * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.fringeRadius" @input="render()" class="w-full" />
+          x-model.number="params.fringeRadius" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
     </div>
   </div>
@@ -107,7 +107,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.vignetteIntensity * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.vignetteIntensity" @input="render()" class="w-full" />
+          x-model.number="params.vignetteIntensity" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
       <div>
         <div class="flex justify-between mb-1.5">
@@ -115,7 +115,7 @@
           <span class="text-xs text-[#888] font-mono" x-text="Math.round(params.vignetteRadius * 100) + '%'"></span>
         </div>
         <input type="range" min="0" max="1" step="0.01"
-          x-model.number="params.vignetteRadius" @input="render()" class="w-full" />
+          x-model.number="params.vignetteRadius" @pointerdown="pushHistory()" @input="render()" class="w-full" />
       </div>
     </div>
   </div>
