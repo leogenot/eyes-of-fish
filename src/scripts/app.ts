@@ -1,5 +1,5 @@
-import { FisheyeEngine } from './engine.ts';
-import type { FisheyeParams, GridOptions, ImageControls } from '../types/index.ts';
+import { FisheyeEngine, buildCurveLUT } from './engine.ts';
+import type { FisheyeParams, GridOptions, ImageControls, Point } from '../types/index.ts';
 import { saveImage, loadImage, saveParams, loadParams } from './storage.ts';
 
 const engine = new FisheyeEngine();
@@ -16,6 +16,8 @@ export function fisheyeApp() {
     sheetDragging: false as boolean,
     sheetDragStartY: 0 as number,
     sheetDragDeltaY: 0 as number,
+
+    dragPointIndex: -1 as number,
 
     params: {
       aspectRatio: '4:3',
@@ -40,6 +42,7 @@ export function fisheyeApp() {
       shadows: 0,
       saturation: 0,
       temperature: 0,
+      rgbCurve: [{ x: 0, y: 0 }, { x: 255, y: 255 }],
     } as FisheyeParams,
 
     gridOptions: {
@@ -112,6 +115,7 @@ export function fisheyeApp() {
       // Watch tab changes
       this.$watch('activeTab', (val: string) => {
         if (val === 'transform') this.$nextTick(() => this.drawGrid());
+        if (val === 'image') this.$nextTick(() => this.drawCurveEditor());
       });
 
       // Keyboard shortcuts: Ctrl/Cmd+Z = undo, +Shift or Ctrl+Y = redo
@@ -173,6 +177,7 @@ export function fisheyeApp() {
       localStorage.setItem('theme', this.theme);
       this.applyTheme();
       if (this.activeTab === 'transform') this.drawGrid(); // Redraw grid with correct colors
+      if (this.activeTab === 'image') this.drawCurveEditor();
     },
 
     applyTheme(this: any) {
@@ -227,6 +232,7 @@ export function fisheyeApp() {
       this.isRendering = false;
       saveParams(this.params);
       if (this.activeTab === 'transform') this.drawGrid();
+      if (this.activeTab === 'image') this.drawCurveEditor();
     },
 
     drawGrid(this: any) {
@@ -340,8 +346,161 @@ export function fisheyeApp() {
 
     resetImage(this: any) {
       this.pushHistory();
-      Object.assign(this.params, { exposure: 0, contrast: 0, highlights: 0, shadows: 0, saturation: 0, temperature: 0 });
+      Object.assign(this.params, { exposure: 0, contrast: 0, highlights: 0, shadows: 0, saturation: 0, temperature: 0, rgbCurve: [{ x: 0, y: 0 }, { x: 255, y: 255 }] });
       this.render();
+    },
+
+    drawCurveEditor(this: any) {
+      const canvas: HTMLCanvasElement = this.$refs.curveCanvas;
+      if (!canvas) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw Grid
+      ctx.strokeStyle = this.theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 1; i < 4; i++) {
+        ctx.moveTo((w / 4) * i, 0); ctx.lineTo((w / 4) * i, h);
+        ctx.moveTo(0, (h / 4) * i); ctx.lineTo(w, (h / 4) * i);
+      }
+      ctx.stroke();
+
+      // Draw Histogram
+      const hist = engine.getHistogram();
+      let maxHist = 0;
+      for (let i = 0; i < 256; i++) if (hist[i] > maxHist) maxHist = hist[i];
+
+      if (maxHist > 0) {
+        ctx.fillStyle = this.theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+        for (let i = 0; i < 256; i++) {
+          const val = (hist[i] / maxHist) * h * 0.9;
+          ctx.lineTo(i * (w / 255), h - val);
+        }
+        ctx.lineTo(w, h);
+        ctx.fill();
+      }
+
+      // Draw Curve
+      const lut = buildCurveLUT(this.params.rgbCurve);
+      ctx.strokeStyle = this.theme === 'dark' ? '#fff' : '#000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < 256; i++) {
+        const x = i * (w / 255);
+        const y = h - lut[i] * (h / 255);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Points
+      ctx.fillStyle = this.theme === 'dark' ? '#000' : '#fff';
+      const pts = this.params.rgbCurve;
+      for (const p of pts) {
+        ctx.beginPath();
+        ctx.arc(p.x * (w / 255), h - p.y * (h / 255), 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+    },
+
+    getCurveCoords(this: any, e: MouseEvent | TouchEvent) {
+      const canvas: HTMLCanvasElement = this.$refs.curveCanvas;
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const scaleX = 255 / rect.width;
+      const scaleY = 255 / rect.height;
+      return {
+        x: Math.max(0, Math.min(255, (clientX - rect.left) * scaleX)),
+        y: Math.max(0, Math.min(255, 255 - (clientY - rect.top) * scaleY))
+      };
+    },
+
+    startCurveDrag(this: any, e: MouseEvent | TouchEvent) {
+      if ('touches' in e) {
+        if ((e as TouchEvent).touches.length > 1) return;
+        e.preventDefault();
+      }
+      const coords = this.getCurveCoords(e);
+      if (!coords) return;
+
+      const pts = this.params.rgbCurve;
+      let closestIdx = -1;
+      let closestDist = Infinity;
+
+      for (let i = 0; i < pts.length; i++) {
+        const dist = Math.hypot(pts[i].x - coords.x, pts[i].y - coords.y);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIdx = i;
+        }
+      }
+
+      if (closestDist < 15) {
+        this.pushHistory();
+        this.dragPointIndex = closestIdx;
+      } else {
+        this.pushHistory();
+        const pt = { x: coords.x, y: coords.y };
+        pts.push(pt);
+        pts.sort((a: Point, b: Point) => a.x - b.x);
+        this.dragPointIndex = pts.indexOf(pt);
+        this.render();
+      }
+    },
+
+    moveCurveDrag(this: any, e: MouseEvent | TouchEvent) {
+      if (this.dragPointIndex === -1) return;
+      if ('touches' in e) e.preventDefault();
+      const coords = this.getCurveCoords(e);
+      if (!coords) return;
+
+      const pts = this.params.rgbCurve;
+      const pt = pts[this.dragPointIndex];
+
+      const prevX = this.dragPointIndex > 0 ? pts[this.dragPointIndex - 1].x + 1 : 0;
+      const nextX = this.dragPointIndex < pts.length - 1 ? pts[this.dragPointIndex + 1].x - 1 : 255;
+
+      pt.x = Math.max(prevX, Math.min(nextX, coords.x));
+      pt.y = coords.y;
+
+      this.drawCurveEditor();
+      this.render();
+    },
+
+    endCurveDrag(this: any) {
+      this.dragPointIndex = -1;
+    },
+
+    removeCurvePoint(this: any, e: MouseEvent) {
+      const coords = this.getCurveCoords(e);
+      if (!coords) return;
+
+      const pts = this.params.rgbCurve;
+      if (pts.length <= 2) return;
+
+      let closestIdx = -1;
+      let closestDist = Infinity;
+      for (let i = 0; i < pts.length; i++) {
+        const dist = Math.hypot(pts[i].x - coords.x, pts[i].y - coords.y);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIdx = i;
+        }
+      }
+
+      if (closestDist < 15 && closestIdx !== 0 && closestIdx !== pts.length - 1) {
+        this.pushHistory();
+        pts.splice(closestIdx, 1);
+        this.render();
+      }
     },
 
     exportImage(this: any) {

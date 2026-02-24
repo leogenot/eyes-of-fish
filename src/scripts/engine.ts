@@ -1,9 +1,84 @@
-import type { FisheyeParams } from '../types/index.ts';
+import type { FisheyeParams, Point } from '../types/index.ts';
+
+export function buildCurveLUT(points: Point[]): Uint8Array {
+  const lut = new Uint8Array(256);
+  if (!points || points.length === 0) {
+    for (let i = 0; i < 256; i++) lut[i] = i;
+    return lut;
+  }
+  if (points.length === 1) {
+    for (let i = 0; i < 256; i++) lut[i] = clamp(Math.round(points[0].y), 0, 255);
+    return lut;
+  }
+
+  const pts = [...points].sort((a, b) => a.x - b.x);
+  const n = pts.length;
+  const x = pts.map(p => p.x);
+  const y = pts.map(p => p.y);
+
+  const m = new Float32Array(n);
+  // Compute derivatives
+  for (let i = 0; i < n; i++) {
+    if (i === 0) {
+      m[i] = (y[1] - y[0]) / (x[1] - x[0]);
+    } else if (i === n - 1) {
+      m[i] = (y[n - 1] - y[n - 2]) / (x[n - 1] - x[n - 2]);
+    } else {
+      const dx1 = x[i] - x[i - 1];
+      const dy1 = y[i] - y[i - 1];
+      const m1 = dy1 / dx1;
+
+      const dx2 = x[i + 1] - x[i];
+      const dy2 = y[i + 1] - y[i];
+      const m2 = dy2 / dx2;
+
+      if (m1 * m2 <= 0) {
+        m[i] = 0;
+      } else {
+        // Harmonic mean
+        m[i] = 2 * m1 * m2 / (m1 + m2);
+      }
+    }
+  }
+
+  let ptIdx = 0;
+  for (let i = 0; i < 256; i++) {
+    if (i <= x[0]) {
+      lut[i] = clamp(Math.round(y[0]), 0, 255);
+    } else if (i >= x[n - 1]) {
+      lut[i] = clamp(Math.round(y[n - 1]), 0, 255);
+    } else {
+      while (ptIdx < n - 2 && i >= x[ptIdx + 1]) {
+        ptIdx++;
+      }
+      const xi = x[ptIdx];
+      const xi1 = x[ptIdx + 1];
+      const dx = xi1 - xi;
+      const t = (i - xi) / dx;
+      const t2 = t * t;
+      const t3 = t2 * t;
+
+      const h00 = 2 * t3 - 3 * t2 + 1;
+      const h10 = t3 - 2 * t2 + t;
+      const h01 = -2 * t3 + 3 * t2;
+      const h11 = t3 - t2;
+
+      const val = h00 * y[ptIdx] + h10 * dx * m[ptIdx] + h01 * y[ptIdx + 1] + h11 * dx * m[ptIdx + 1];
+      lut[i] = clamp(Math.round(val), 0, 255);
+    }
+  }
+  return lut;
+}
 
 export class FisheyeEngine {
   private sourceImage: HTMLImageElement | null = null;
   private outputCanvas: HTMLCanvasElement | null = null;
   private processing = false;
+  private histogram = new Uint32Array(256);
+
+  getHistogram(): Uint32Array {
+    return this.histogram;
+  }
 
   setCanvas(canvas: HTMLCanvasElement): void {
     this.outputCanvas = canvas;
@@ -24,6 +99,7 @@ export class FisheyeEngine {
       borderSize, borderSoftness, borderColor,
       fringeIntensity, fringeRadius,
       vignetteIntensity, vignetteRadius,
+      rgbCurve,
       exposure, contrast, highlights, shadows, saturation, temperature,
     } = params;
 
@@ -82,7 +158,7 @@ export class FisheyeEngine {
     let imageData = wCtx.getImageData(0, 0, outW, outH);
 
     imageData = this._applyImageAdjustments(imageData, {
-      exposure, contrast, highlights, shadows, saturation, temperature,
+      exposure, contrast, highlights, shadows, saturation, temperature, rgbCurve
     });
 
     if (distortion > 0) {
@@ -107,11 +183,14 @@ export class FisheyeEngine {
 
   private _applyImageAdjustments(
     imageData: ImageData,
-    opts: Pick<FisheyeParams, 'exposure' | 'contrast' | 'highlights' | 'shadows' | 'saturation' | 'temperature'>,
+    opts: Pick<FisheyeParams, 'exposure' | 'contrast' | 'highlights' | 'shadows' | 'saturation' | 'temperature' | 'rgbCurve'>,
   ): ImageData {
-    const { exposure, contrast, highlights, shadows, saturation, temperature } = opts;
+    const { exposure, contrast, highlights, shadows, saturation, temperature, rgbCurve } = opts;
     const data = imageData.data;
     const len = data.length;
+
+    this.histogram.fill(0);
+    const lut = buildCurveLUT(rgbCurve || [{ x: 0, y: 0 }, { x: 255, y: 255 }]);
 
     const expMul = Math.pow(2, exposure);
     const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
@@ -160,6 +239,13 @@ export class FisheyeEngine {
         g = clamp(gray + sat * (g - gray), 0, 255);
         b = clamp(gray + sat * (b - gray), 0, 255);
       }
+
+      const lumBeforeCurve = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+      this.histogram[clamp(lumBeforeCurve, 0, 255)]++;
+
+      r = lut[clamp(Math.round(r), 0, 255)];
+      g = lut[clamp(Math.round(g), 0, 255)];
+      b = lut[clamp(Math.round(b), 0, 255)];
 
       data[i] = r;
       data[i + 1] = g;

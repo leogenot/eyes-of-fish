@@ -2,6 +2,11 @@ export type DistortionType = 'circular' | 'full';
 export type BorderColor = 'black' | 'white';
 export type AspectRatio = '4:3' | '3:2' | '1:1' | '16:9';
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export interface FisheyeParams {
   aspectRatio: AspectRatio;
   // Transform
@@ -21,6 +26,8 @@ export interface FisheyeParams {
   fringeRadius: number;
   vignetteIntensity: number;
   vignetteRadius: number;
+  // Curve
+  rgbCurve: Point[];
   // Image
   exposure: number;
   contrast: number;

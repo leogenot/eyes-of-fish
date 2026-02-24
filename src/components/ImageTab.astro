@@ -39,6 +39,24 @@
       </template>
     </div>
   </div>
+  <div class="mb-4">
+    <div class="flex justify-between items-end mb-1.5">
+      <p class="section-label mb-0">Curve</p>
+      <span class="text-[10px] text-[#888]">Dbl-click to remove</span>
+    </div>
+    <div class="w-full aspect-square border border-[#e5e5e5] dark:border-[#333] rounded-md overflow-hidden relative touch-none bg-[#f9f9f9] dark:bg-[#111]">
+      <canvas 
+        x-ref="curveCanvas" 
+        width="256" height="256" 
+        class="w-full h-full block cursor-crosshair"
+        @pointerdown="startCurveDrag" 
+        @pointermove="moveCurveDrag" 
+        @pointerup="endCurveDrag" 
+        @pointercancel="endCurveDrag" 
+        @dblclick="removeCurvePoint"
+      ></canvas>
+    </div>
+  </div>
   <button
     @click="resetImage()"
     class="w-full py-2 text-xs border border-[#1f1f1f] rounded-md text-[#555] hover:text-[#999] transition-all mt-1"
