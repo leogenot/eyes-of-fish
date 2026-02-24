@@ -12,6 +12,11 @@ export function fisheyeApp() {
     sheetOpen: false as boolean,
     theme: 'light' as 'light' | 'dark',
 
+    // Mobile sheet drag state
+    sheetDragging: false as boolean,
+    sheetDragStartY: 0 as number,
+    sheetDragDeltaY: 0 as number,
+
     params: {
       aspectRatio: '4:3',
       rotation: 0,
@@ -124,6 +129,34 @@ export function fisheyeApp() {
       });
     },
 
+    // Mobile bottom sheet drag handlers (handle swipe up/down to open/close)
+    startSheetDrag(this: any, e: TouchEvent) {
+      if (e.touches.length !== 1) return;
+      this.sheetDragging = true;
+      this.sheetDragStartY = e.touches[0].clientY;
+      this.sheetDragDeltaY = 0;
+    },
+
+    moveSheetDrag(this: any, e: TouchEvent) {
+      if (!this.sheetDragging || e.touches.length !== 1) return;
+      const currentY = e.touches[0].clientY;
+      this.sheetDragDeltaY = currentY - this.sheetDragStartY;
+    },
+
+    endSheetDrag(this: any) {
+      if (!this.sheetDragging) return;
+      const threshold = 30;
+      if (this.sheetDragDeltaY < -threshold) {
+        // Dragged up enough -> open sheet
+        this.sheetOpen = true;
+      } else if (this.sheetDragDeltaY > threshold) {
+        // Dragged down enough -> close sheet
+        this.sheetOpen = false;
+      }
+      this.sheetDragging = false;
+      this.sheetDragDeltaY = 0;
+    },
+
     initTheme(this: any) {
       const saved = localStorage.getItem('theme');
       if (saved === 'light' || saved === 'dark') {
@@ -157,6 +190,7 @@ export function fisheyeApp() {
         ? `width: min(80vw, calc(75vh * ${r})); aspect-ratio: ${r};`
         : `height: min(80vh, calc(75vw / ${r})); aspect-ratio: ${r};`;
     },
+
 
     handleDrop(this: any, e: DragEvent) {
       (e.currentTarget as HTMLElement).classList.remove('drag-over');

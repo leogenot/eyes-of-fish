@@ -12,6 +12,9 @@ import ImageTab from './ImageTab.astro';
   <div
     class="sm:hidden flex justify-center items-center h-8 shrink-0 cursor-pointer"
     @click="sheetOpen = !sheetOpen"
+    @touchstart.passive="startSheetDrag($event)"
+    @touchmove.passive="moveSheetDrag($event)"
+    @touchend="endSheetDrag()"
   >
     <div class="w-10 h-1 rounded-full bg-fish-muted"></div>
   </div>
