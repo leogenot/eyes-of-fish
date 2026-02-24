@@ -159,6 +159,67 @@ export class FisheyeEngine {
     return imageData;
   }
 
+  // private _applyBarrelDistortion(
+  //   imageData: ImageData,
+  //   w: number,
+  //   h: number,
+  //   strength: number,
+  //   type: string,
+  // ): ImageData {
+  //   const src = imageData.data;
+  //   const out = new ImageData(w, h);
+  //   const dst = out.data;
+
+  //   const cx = w / 2;
+  //   const cy = h / 2;
+  //   const maxR = Math.sqrt(cx * cx + cy * cy);
+  //   const k = strength * 1.8;
+
+  //   for (let y = 0; y < h; y++) {
+  //     for (let x = 0; x < w; x++) {
+  //       const nx = (x - cx) / maxR;
+  //       const ny = (y - cy) / maxR;
+  //       const r = Math.sqrt(nx * nx + ny * ny);
+
+  //       let srcX: number, srcY: number;
+
+  //       if (type === 'circular' && r > 1.0) {
+  //         const i = (y * w + x) * 4;
+  //         dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
+  //         continue;
+  //       }
+
+  //       const rd = r;
+  //       const ru = rd * (1 + k * rd * rd);
+
+  //       if (ru === 0) {
+  //         srcX = cx;
+  //         srcY = cy;
+  //       } else {
+  //         const scale = ru / (r || 0.0001);
+  //         srcX = cx + nx * maxR * scale;
+  //         srcY = cy + ny * maxR * scale;
+  //       }
+  //       if (srcX < 0 || srcX > w - 1 || srcY < 0 || srcY > h - 1) {
+  //         const i = (y * w + x) * 4;
+  //         dst[i] = 0;
+  //         dst[i + 1] = 0;
+  //         dst[i + 2] = 0;
+  //         dst[i + 3] = 0; // Set to 0 for transparent, or 255 for black background
+  //         continue;
+  //       }
+
+  //       const color = bilinearSample(src, w, h, srcX, srcY);
+  //       const i = (y * w + x) * 4;
+  //       dst[i] = color[0];
+  //       dst[i + 1] = color[1];
+  //       dst[i + 2] = color[2];
+  //       dst[i + 3] = color[3];
+  //     }
+  //   }
+  //   return out;
+  // }
+
   private _applyBarrelDistortion(
     imageData: ImageData,
     w: number,
@@ -172,6 +233,7 @@ export class FisheyeEngine {
 
     const cx = w / 2;
     const cy = h / 2;
+    // 1. Use Math.min to perfectly match your circular mask's boundaries
     const maxR = Math.min(cx, cy);
     const k = strength * 1.8;
 
@@ -181,16 +243,19 @@ export class FisheyeEngine {
         const ny = (y - cy) / maxR;
         const r = Math.sqrt(nx * nx + ny * ny);
 
-        let srcX: number, srcY: number;
-
         if (type === 'circular' && r > 1.0) {
           const i = (y * w + x) * 4;
-          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
+          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
           continue;
         }
 
         const rd = r;
-        const ru = rd * (1 + k * rd * rd);
+
+        // 2. NORMALIZE the distortion math!
+        // Dividing by (1 + k) ensures the image stretches perfectly to the edge.
+        const ru = (rd * (1 + k * rd * rd)) / (1 + k);
+
+        let srcX: number, srcY: number;
 
         if (ru === 0) {
           srcX = cx;
@@ -201,9 +266,16 @@ export class FisheyeEngine {
           srcY = cy + ny * maxR * scale;
         }
 
+        // Failsafe: hide out-of-bounds pixels to prevent smearing
+        if (srcX < 0 || srcX > w - 1 || srcY < 0 || srcY > h - 1) {
+          const i = (y * w + x) * 4;
+          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
+          continue;
+        }
+
         const color = bilinearSample(src, w, h, srcX, srcY);
         const i = (y * w + x) * 4;
-        dst[i]     = color[0];
+        dst[i] = color[0];
         dst[i + 1] = color[1];
         dst[i + 2] = color[2];
         dst[i + 3] = color[3];
@@ -241,14 +313,14 @@ export class FisheyeEngine {
         const shift = falloff * maxShift;
         const blueX = x + (nx / (r + 0.001)) * shift;
         const blueY = y + (ny / (r + 0.001)) * shift;
-        const redX  = x - (nx / (r + 0.001)) * shift * 0.3;
-        const redY  = y - (ny / (r + 0.001)) * shift * 0.3;
+        const redX = x - (nx / (r + 0.001)) * shift * 0.3;
+        const redY = y - (ny / (r + 0.001)) * shift * 0.3;
 
         const blueColor = bilinearSample(src, w, h, blueX, blueY);
-        const redColor  = bilinearSample(src, w, h, redX, redY);
+        const redColor = bilinearSample(src, w, h, redX, redY);
 
         const i = (y * w + x) * 4;
-        dst[i]     = clamp(redColor[0], 0, 255);
+        dst[i] = clamp(redColor[0], 0, 255);
         dst[i + 2] = clamp(blueColor[2], 0, 255);
       }
     }
@@ -278,7 +350,7 @@ export class FisheyeEngine {
         const darkening = 1.0 - intensity * Math.pow(vig, 1.5);
 
         const i = (y * w + x) * 4;
-        data[i]     = clamp(data[i]     * darkening, 0, 255);
+        data[i] = clamp(data[i] * darkening, 0, 255);
         data[i + 1] = clamp(data[i + 1] * darkening, 0, 255);
         data[i + 2] = clamp(data[i + 2] * darkening, 0, 255);
       }
@@ -315,7 +387,7 @@ export class FisheyeEngine {
         } else if (r > circleR - softPx) {
           const t = (r - (circleR - softPx)) / (2 * softPx);
           const alpha = Math.max(0, Math.min(1, t));
-          data[i]     = clamp(data[i]     * (1 - alpha) + borderVal * alpha, 0, 255);
+          data[i] = clamp(data[i] * (1 - alpha) + borderVal * alpha, 0, 255);
           data[i + 1] = clamp(data[i + 1] * (1 - alpha) + borderVal * alpha, 0, 255);
           data[i + 2] = clamp(data[i + 2] * (1 - alpha) + borderVal * alpha, 0, 255);
         }
